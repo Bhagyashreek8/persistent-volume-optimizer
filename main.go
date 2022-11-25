@@ -90,7 +90,7 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 }
 
 func fetchConfigMap(cmobj *v1.ConfigMap) {
-	var srcVol, destVol string
+	var srcVolPath, destVolPath, policy string
 	cmName := cmobj.Name
 	//cmStatus := fmt.Sprintf("%v", cmobj.Status.Phase)
 	if strings.Contains(cmName, cmNamePrefix) {
@@ -98,10 +98,18 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		log.Println("configmap cmobj.Data", cmobj.Data)
 		cmData := cmobj.Data
 
-		srcVol = cmData["source-volume"]
-		destVol = cmData["dest-volume"]
-		log.Println("configmap srcVol", srcVol)
-		log.Println("configmap destVol", destVol)
+		srcVolPath = cmData["source-volume-path"]
+		destVolPath = cmData["dest-volume-path"]
+		policy = cmData["policy"]
+		log.Println("configmap srcVol", srcVolPath)
+		log.Println("configmap destVol", destVolPath)
+		log.Println("configmap destVol", policy)
+
+		//call the script to move the files
+		_, _, err := ExecuteCommand("./scripts/moveData.sh")
+		if err != "" {
+			fmt.Println(err)
+		}
 	}
 
 		//Fetch events for this PVC
