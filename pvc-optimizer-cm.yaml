@@ -1,0 +1,10 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pvc-optimizer-xxx
+  namespace: default
+data:
+  source-volume-path: pvc1
+  dest-volume-path: pvc2
+#  policy: "text"
+
