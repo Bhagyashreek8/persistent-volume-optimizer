@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-server
+spec:
+  containers:
+   - name: web-server
+     image: nginx:latest
+     command:
+        - "/bin/sh"
+        - "-c"
+        - while true; do echo "bhagya" >> /mnt/vpcdisk/vpcfile; sleep 1; echo "Gaurav" >> /mnt/cosdisk/cosfile; sleep 1; done
+     volumeMounts:
+       - mountPath: /mnt/vpcdisk
+         name: vpcdisk
+       - mountPath: /mnt/cosdisk
+         name: cosdisk
+  volumes:
+   - name: vpcdisk
+     persistentVolumeClaim:
+       claimName: pvc1
+   - name: cosdisk
+     persistentVolumeClaim:
+       claimName: pvc2
+

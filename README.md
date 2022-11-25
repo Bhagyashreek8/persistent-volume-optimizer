@@ -1,2 +1,2 @@
-# resource-optimizer
+# persistent-volume-optimizer
 
