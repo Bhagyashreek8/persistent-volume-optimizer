@@ -6,7 +6,7 @@ metadata:
 spec:
   serviceAccountName: pod-enable
   containers:
-   - name: web-server
+   - name: web-server-pod
      image: nginx:latest
      command:
         - "/bin/sh"
@@ -19,11 +19,7 @@ spec:
          name: cosdisk
 
    - name: persistent-volume-optimizer
-     image: bhagyak1/optimizer:02
-     command:
-       # - "/bin/sh"
-       # - "-c"
-       # - while true; do echo "optimizer"
+     image: bhagyak1/optimizer:03
      volumeMounts:
        - mountPath: /mnt/vpcdisk
          name: vpcdisk
