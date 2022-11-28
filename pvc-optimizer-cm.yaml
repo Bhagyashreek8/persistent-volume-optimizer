@@ -6,5 +6,5 @@ metadata:
 data:
   source-volume-path: pvc1
   dest-volume-path: pvc2
-#  policy: "text"
+  policy: "aDate>15days"   #days, months, years
 

@@ -1,11 +1,15 @@
 #!/bin/bash
 #We need srcMountPath, dstMountPath as inputs
-policyADate=$(echo $3 | cut -d ">" -f 2)
+#policyADate=$(echo $3 | cut -d ">" -f 2)
+policyADate=$3
 #recursevily walk the filesystem
 find $1 -print0 | while IFS= read -r -d '' file;
     do  echo "$file";
-    if [ -e $file ]
+    if [ -f $file ]
     then
+	    echo "file exists"
+	    file1=$(echo $file | rev | cut -d "/" -f 1 | rev)
+	    echo $file1
         #Get the Access Time of the file
         aDate=$(stat $file | grep -i Access | tail -1 | awk -F " " '{print $2}')
         #Get the date in above format
@@ -14,9 +18,9 @@ find $1 -print0 | while IFS= read -r -d '' file;
         if [ $diff>$policyADate ]
         then
             #Move the file to dst
-            mv $1/$file $2
+            mv $file $2
             #Make a symlink
-            ln -s $file
+            ln -s $2/$file1 $file
         fi
     fi
     done;

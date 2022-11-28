@@ -13,7 +13,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
+	"os"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -90,7 +93,8 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 }
 
 func fetchConfigMap(cmobj *v1.ConfigMap) {
-	var srcVolPath, destVolPath, policy string
+	var srcVolPath, destVolPath string
+	var policyDays int
 	cmName := cmobj.Name
 	//cmStatus := fmt.Sprintf("%v", cmobj.Status.Phase)
 	if strings.Contains(cmName, cmNamePrefix) {
@@ -100,27 +104,41 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 
 		srcVolPath = cmData["source-volume-path"]
 		destVolPath = cmData["dest-volume-path"]
-		policy = cmData["policy"]
+		policy := cmData["policy"]   //aDate>15days
+
+		if len(srcVolPath) == 0 || len(destVolPath) ==  0 || len(policy) == 0 {
+			log.Println("required params empty")
+			os.Exit(3)
+		}
+
 		log.Println("configmap srcVol", srcVolPath)
 		log.Println("configmap destVol", destVolPath)
 		log.Println("configmap destVol", policy)
 
+		policyArr := strings.Split(policy, ">")
+
+		log.Println("policyArr ", policyArr)
+
+		re:=regexp.MustCompile("\\d+|\\D+")
+		policyTmp := re.FindAllString(policyArr[1], -1)
+		policyDaysTmp, _ := strconv.Atoi(policyTmp[0])
+		if policyTmp[1] == "days" {
+			policyDays = policyDaysTmp
+		} else if policyTmp[1] == "months" {
+			policyDays = policyDaysTmp * 30
+		} else if policyTmp[1] == "years" {
+			policyDays = policyDaysTmp * 365
+		}
+
+		//split policy and get days ; convert the policy into days
+		log.Println("configmap destVol", policyDays)
+
 		//call the script to move the files
-		_, _, err := ExecuteCommand("./scripts/moveData.sh")
+		_, _, err := ExecuteCommand("./scripts/moveData.sh $srcVolPath $destVolPath $policyDays")
 		if err != "" {
 			fmt.Println(err)
 		}
 	}
-
-		//Fetch events for this PVC
-		// kubectl get events --field-selector involvedObject.kind=PersistentVolumeClaim,involvedObject.name=csi-block-pvc-good -n default
-		//getPvcEventsCmd := "kubectl get events --field-selector involvedObject.kind=PersistentVolumeClaim,involvedObject.name=" + cmobj.Name + " -n " + cmobj.Namespace
-		//_, pvcEvents, err := ExecuteCommand(getPvcEventsCmd)
-		//if err != "" {
-		//	fmt.Println(err)
-		//}
-		//fmt.Println("PVC Events: \n", pvcEvents)
-
 }
 
 func topNodes() string {
@@ -131,21 +149,6 @@ func topNodes() string {
 		fmt.Println(err)
 	}
 	return out
-}
-
-func enableVPCProvisioner() {
-	enableVPCDriverStatefulSetCmd := "kubectl scale --replicas=1 -n kube-system StatefulSet ibm-vpc-block-csi-controller"
-	enableVPCDriverDaemonSetCmd := "kubectl patch daemonset ibm-vpc-block-csi-node --type json -p='[{\"op\": \"remove\", \"path\": \"/spec/template/spec/nodeSelector/non-existing\"}]' -n kube-system"
-
-	_, _, err := ExecuteCommand(enableVPCDriverStatefulSetCmd)
-	if err != "" {
-		fmt.Println(err)
-	}
-	_, _, err = ExecuteCommand(enableVPCDriverDaemonSetCmd)
-	if err != "" {
-		fmt.Println(err)
-	}
-	log.Println("vpc block driver enabled ")
 }
 
 
