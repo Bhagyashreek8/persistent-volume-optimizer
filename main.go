@@ -112,7 +112,7 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 
 		log.Println("configmap srcVol", srcVolPath)
 		log.Println("configmap destVol", destVolPath)
-		log.Println("configmap destVol", policy)
+		log.Println("configmap policy", policy)
 
 		policyArr := strings.Split(policy, ">")
 
@@ -130,7 +130,7 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		}
 
 		//split policy and get days ; convert the policy into days
-		log.Println("configmap destVol", policyDays)
+		log.Println("configmap policy days:", policyDays)
 
 		//call the script to move the files
 		_, _, err := ExecuteCommand("./scripts/moveData.sh $srcVolPath $destVolPath $policyDays")
@@ -139,17 +139,6 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		}
 	}
 }
-
-func topNodes() string {
-	topNodesCmd := "kubectl top nodes"
-
-	_, out, err := ExecuteCommand(topNodesCmd)
-	if err != "" {
-		fmt.Println(err)
-	}
-	return out
-}
-
 
 // ExecuteCommand to execute shell commands
 func ExecuteCommand(command string) (int, string, string) {

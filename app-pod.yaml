@@ -4,6 +4,7 @@ kind: Pod
 metadata:
   name: web-server
 spec:
+  serviceAccountName: pod-enable
   containers:
    - name: web-server
      image: nginx:latest
@@ -18,7 +19,7 @@ spec:
          name: cosdisk
 
    - name: persistent-volume-optimizer
-     image: bhagyak1/optimizer:01
+     image: bhagyak1/optimizer:02
      command:
        # - "/bin/sh"
        # - "-c"
@@ -34,4 +35,4 @@ spec:
        claimName: pvc1
    - name: cosdisk
      persistentVolumeClaim:
-       claimName: pvc2 
+       claimName: pvc2

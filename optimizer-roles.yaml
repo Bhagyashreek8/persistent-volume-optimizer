@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pod-enable
+  namespace: default
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pod-enable
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pod-enable
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: pod-enable
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: pod-enable
+  apiGroup: rbac.authorization.k8s.io

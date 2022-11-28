@@ -15,7 +15,7 @@ find $1 -print0 | while IFS= read -r -d '' file;
         #Get the date in above format
         currDate=$(date +%Y-%m-%d)
         diff=$(( ($(date -d $aDate +%s) - $(date -d $currDate +%s)) / 86400))
-        if [ $diff>$policyADate ]
+        if [ "$diff" > "$policyADate" ]
         then
             #Move the file to dst
             mv $file $2
