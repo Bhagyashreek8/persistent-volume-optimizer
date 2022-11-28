@@ -133,7 +133,7 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		log.Println("configmap policy days:", policyDays)
 
 		//call the script to move the files
-		_, _, err := ExecuteCommand("./scripts/moveData.sh $srcVolPath $destVolPath $policyDays")
+		_, _, err := ExecuteCommand("sh /scripts/moveData.sh $srcVolPath $destVolPath $policyDays")
 		if err != "" {
 			fmt.Println(err)
 		}
