@@ -16,11 +16,22 @@ spec:
          name: vpcdisk
        - mountPath: /mnt/cosdisk
          name: cosdisk
+
+   - name: persistent-volume-optimizer
+     image: bhagyak1/optimizer:01
+     command:
+       # - "/bin/sh"
+       # - "-c"
+       # - while true; do echo "optimizer"
+     volumeMounts:
+       - mountPath: /mnt/vpcdisk
+         name: vpcdisk
+       - mountPath: /mnt/cosdisk
+         name: cosdisk
   volumes:
    - name: vpcdisk
      persistentVolumeClaim:
        claimName: pvc1
    - name: cosdisk
      persistentVolumeClaim:
-       claimName: pvc2
-
+       claimName: pvc2 

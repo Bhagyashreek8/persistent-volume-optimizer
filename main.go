@@ -23,10 +23,9 @@ import (
 )
 
 const (
-	vpcProvisioner = "vpc.block.csi.ibm.io"
-	s3fsProvisioner = "ibm.io/ibmc-s3fs"
+	//vpcProvisioner = "vpc.block.csi.ibm.io"
+	//s3fsProvisioner = "ibm.io/ibmc-s3fs"
 	cmNamePrefix = "pvc-optimizer"
-	mountFailed = "FailedMount"
 )
 
 var master = flag.String(
@@ -39,7 +38,7 @@ var master = flag.String(
 // /Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-blk-cos-hackathon-cddqn4q20b8mu62tdjb0/kube-config-aaa00-bha-blk-cos-hackathon.yml
 var kubeconfig = flag.String(
 	"kubeconfig",
-	"/Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-blk-cos-hackathon-cddqn4q20b8mu62tdjb0/kube-config-aaa00-bha-blk-cos-hackathon.yml",
+	"",
 	"Absolute path to the kubeconfig file. Either this or master needs to be set if the provisioner is being run out of cluster.",
 )
 
