@@ -132,8 +132,10 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		//split policy and get days ; convert the policy into days
 		log.Println("configmap policy days:", policyDays)
 
+		cmd := "sh scripts/moveData.sh " + srcVolPath + " " + destVolPath + " " + strconv.Itoa(policyDays)
+
 		//call the script to move the files
-		_, _, err := ExecuteCommand("sh scripts/moveData.sh $srcVolPath $destVolPath $policyDays")
+		_, _, err := ExecuteCommand(cmd)
 		if err != "" {
 			fmt.Println(err)
 		}
