@@ -81,14 +81,7 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 				fetchConfigMap(cmobj)
 			},
 			DeleteFunc: nil,
-			UpdateFunc: func(obj interface{}) {
-				fmt.Printf("configmap updated \n")
-				cmobj, ok := obj.(*v1.ConfigMap)
-				if !ok {
-					log.Println("Error in reading watcher event data of config map")
-				}
-				fetchConfigMap(cmobj)
-			},
+			UpdateFunc: nil,
 		},
 	)
 
