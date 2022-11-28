@@ -5,7 +5,7 @@ policyADate=$3
 #recursevily walk the filesystem
 find $1 -print0 | while IFS= read -r -d '' file;
     do  echo "file: $file";
-    if [ -f $file ]
+    if [ -f $file ] && [ ! -L $file ]
     then
 	    echo "file exists"
 	    file1=$(echo $file | rev | cut -d "/" -f 1 | rev)
@@ -23,7 +23,7 @@ find $1 -print0 | while IFS= read -r -d '' file;
             #Make a symlink
             ln -s $2/$file1 $file
             echo "symlink created"
-            ls -l
+            ls -l $1
         fi
     fi
     done;

@@ -81,7 +81,14 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 				fetchConfigMap(cmobj)
 			},
 			DeleteFunc: nil,
-			UpdateFunc: nil,
+			UpdateFunc: func(obj interface{}) {
+				fmt.Printf("configmap updated \n")
+				cmobj, ok := obj.(*v1.ConfigMap)
+				if !ok {
+					log.Println("Error in reading watcher event data of config map")
+				}
+				fetchConfigMap(cmobj)
+			},
 		},
 	)
 
@@ -103,7 +110,12 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 
 		srcVolPath = cmData["source-volume-path"]
 		destVolPath = cmData["dest-volume-path"]
+		//todo - remove trailing "/" from paths
 		policy := cmData["policy"]   //aDate>15days
+
+		os.Setenv("SOURCEVOLPATH", srcVolPath)
+		os.Setenv("DESTVOLPATH", destVolPath)
+		os.Setenv("POLICY", policy)
 
 		if len(srcVolPath) == 0 || len(destVolPath) ==  0 || len(policy) == 0 {
 			log.Println("required params empty")
@@ -131,6 +143,8 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 
 		//split policy and get days ; convert the policy into days
 		log.Println("configmap policy days:", policyDays)
+
+		// create a cron job which will call script from cron job
 
 		cmd := "sh scripts/moveData.sh " + srcVolPath + " " + destVolPath + " " + strconv.Itoa(policyDays)
 
