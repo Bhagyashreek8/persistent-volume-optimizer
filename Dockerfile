@@ -1,5 +1,6 @@
 FROM ubuntu:latest
 
+USER root
 #Install Cron
 RUN apt-get update
 RUN apt-get -y install cron
@@ -15,9 +16,9 @@ COPY persistent-volume-optimizer /app
 COPY /scripts/moveData.sh /app
 WORKDIR /app
 
-RUN chmod +x ./app/persistent-volume-optimizer ./app/moveData.sh
+RUN chmod +x /app/persistent-volume-optimizer /app/moveData.sh
 #RUN go build --ldflags '-extldflags "-static"' -o persistent-volume-optimizer ./main.go
-ENTRYPOINT ["./app/persistent-volume-optimizer"]
+ENTRYPOINT ["/app/persistent-volume-optimizer"]
 
 # Add the cron job
 RUN crontab -l | { cat; echo "*/1 * * * * bash /app/moveData.sh"; } | crontab -

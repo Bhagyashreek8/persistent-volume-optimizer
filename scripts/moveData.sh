@@ -1,9 +1,14 @@
 #!/bin/sh
-#We need srcMountPath, dstMountPath as inputs
-#policyADate=$(echo $3 | cut -d ">" -f 2)
-policyADate=$3
+#read srcvolpath, destvolpath, policy from file
+value=$(<pvc-optimizer-01.txt)
+echo "$value"
+cmDetails=echo $value | cut -d "\n"
+echo $cmDetails
+svolpath=cmDetails[0]
+dvolpath=cmDetails[1]
+policyADate=cmDetails[2]
 #recursevily walk the filesystem
-find $1 -print0 | while IFS= read -r -d '' file;
+find $svolpath -print0 | while IFS= read -r -d '' file;
     do  echo "file: $file";
     if [ -f $file ] && [ ! -L $file ]
     then
@@ -19,11 +24,11 @@ find $1 -print0 | while IFS= read -r -d '' file;
         then
             echo "file to move: $file"
             #Move the file to dst
-            mv $file $2
+            mv $file $dvolpath
             #Make a symlink
-            ln -s $2/$file1 $file
-            echo "symlink created"
-            ls -l $1
+            ln -s $dvolpath/$file1 $file
+            echo "symlink created successfully"
+            ls -l $svolpath
         fi
     fi
     done;
