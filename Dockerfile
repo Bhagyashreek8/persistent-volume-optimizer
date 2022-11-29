@@ -21,8 +21,9 @@ RUN chmod +x /app/persistent-volume-optimizer /app/moveData.sh
 ENTRYPOINT ["/app/persistent-volume-optimizer"]
 
 # Add the cron job
-RUN crontab -l | { cat; echo "*/1 * * * * bash /app/moveData.sh"; } | crontab -
+CMD ["/app/cron./sh"]
+#CMD crontab -l | { cat; echo "*/1 * * * * bash /app/moveData.sh"; } | crontab -
 
 # Run the command on container startup
-CMD cron
+#CMD cron
 
