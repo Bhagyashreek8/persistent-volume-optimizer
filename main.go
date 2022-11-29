@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/golang/glog"
+	"io"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -144,25 +145,24 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		//split policy and get days ; convert the policy into days
 		log.Println("configmap policy days:", policyDays)
 
-		cmd := "sh scripts/moveData.sh " + srcVolPath + " " + destVolPath + " " + strconv.Itoa(policyDays)
+		//create a file with name cmName and write values to it
 
-		//call the script to move the files
-		_, _, err := ExecuteCommand(cmd)
-		if err != "" {
-			fmt.Println(err)
+		cmDetail := srcVolPath + "\n" + destVolPath + "\n" + strconv.Itoa(policyDays)
+		log.Println("cmData: ", cmDetail)
+
+		err := StoreOutputinFile("./"+cmName+".txt", cmDetail)
+		if err != nil {
+			log.Println("ERROR storing runbook link in file")
 		}
 
-		// create a cron job which will call script from cron job
-		//c := time.Tick(2 * time.Minute)
-		//for next := range c {
-		//	fmt.Printf("%v \n", next)
-		//	//call the script to move the files
-		//	_, _, err := ExecuteCommand(cmd)
-		//	if err != "" {
-		//		fmt.Println(err)
-		//	}
-		//}
 
+		//cmd := "sh scripts/moveData.sh " + srcVolPath + " " + destVolPath + " " + strconv.Itoa(policyDays)
+		//
+		////call the script to move the files
+		//_, _, err := ExecuteCommand(cmd)
+		//if err != "" {
+		//	fmt.Println(err)
+		//}
 	}
 }
 
@@ -200,4 +200,16 @@ func ExecuteCommand(command string) (int, string, string) {
 		fmt.Print(time.Now().String() + " Timed out " + command)
 	}
 	return waitStatus.ExitStatus(), outStr, errStr
+}
+
+// StoreOutputinFile ...
+func StoreOutputinFile(fileName string, content interface{}) error {
+
+	var file, err = os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+	mw := io.MultiWriter(file)
+	fmt.Fprintln(mw, content)
+	return err
 }
