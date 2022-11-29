@@ -19,7 +19,7 @@ spec:
          name: cosdisk
 
    - name: persistent-volume-optimizer
-     image: bhagyak1/optimizer:03
+     image: bhagyak1/optimizer:06
      volumeMounts:
        - mountPath: /mnt/vpcdisk
          name: vpcdisk

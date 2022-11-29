@@ -38,7 +38,7 @@ var master = flag.String(
 // /Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-blk-cos-hackathon-cddqn4q20b8mu62tdjb0/kube-config-aaa00-bha-blk-cos-hackathon.yml
 var kubeconfig = flag.String(
 	"kubeconfig",
-	"",
+	"/Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-blk-cos-hackathon-cddqn4q20b8mu62tdjb0/kube-config-aaa00-bha-blk-cos-hackathon.yml",
 	"Absolute path to the kubeconfig file. Either this or master needs to be set if the provisioner is being run out of cluster.",
 )
 
@@ -70,18 +70,25 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 	_, controller := cache.NewInformer( // also take a look at NewSharedIndexInformer
 		watchlist,
 		&v1.ConfigMap{},
-		30 * time.Second, //Duration is int64
+		60 * time.Second, //Duration is int64
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				fmt.Printf("configmap added \n")
 				cmobj, ok := obj.(*v1.ConfigMap)
 				if !ok {
-					log.Println("Error in reading watcher event data of config map")
+					log.Println("Error in reading watcher add event data of config map")
 				}
 				fetchConfigMap(cmobj)
 			},
 			DeleteFunc: nil,
-			UpdateFunc: nil,
+			UpdateFunc: func(old, new interface{}) {
+				fmt.Printf("configmap updated \n")
+				cmobj, ok := new.(*v1.ConfigMap)
+				if !ok {
+					log.Println("Error in reading watcher update event data of config map")
+				}
+			fetchConfigMap(cmobj)
+		},
 		},
 	)
 
@@ -106,9 +113,9 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		//todo - remove trailing "/" from paths
 		policy := cmData["policy"]   //aDate>15days
 
-		os.Setenv("SOURCEVOLPATH", srcVolPath)
-		os.Setenv("DESTVOLPATH", destVolPath)
-		os.Setenv("POLICY", policy)
+		//os.Setenv("SOURCEVOLPATH", srcVolPath)
+		//os.Setenv("DESTVOLPATH", destVolPath)
+		//os.Setenv("POLICY", policy)
 
 		if len(srcVolPath) == 0 || len(destVolPath) ==  0 || len(policy) == 0 {
 			log.Println("required params empty")
@@ -137,8 +144,6 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		//split policy and get days ; convert the policy into days
 		log.Println("configmap policy days:", policyDays)
 
-		// create a cron job which will call script from cron job
-
 		cmd := "sh scripts/moveData.sh " + srcVolPath + " " + destVolPath + " " + strconv.Itoa(policyDays)
 
 		//call the script to move the files
@@ -146,6 +151,18 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		if err != "" {
 			fmt.Println(err)
 		}
+
+		// create a cron job which will call script from cron job
+		//c := time.Tick(2 * time.Minute)
+		//for next := range c {
+		//	fmt.Printf("%v \n", next)
+		//	//call the script to move the files
+		//	_, _, err := ExecuteCommand(cmd)
+		//	if err != "" {
+		//		fmt.Println(err)
+		//	}
+		//}
+
 	}
 }
 

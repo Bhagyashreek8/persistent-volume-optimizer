@@ -25,5 +25,5 @@ WORKDIR /app
 RUN curl -LO https://dl.k8s.io/release/v1.25.0/bin/linux/amd64/kubectl
 RUN chmod u+x kubectl && mv kubectl /bin/kubectl
 RUN go build --ldflags '-extldflags "-static"' -o persistent-volume-optimizer ./main.go
-ENTRYPOINT ["./persistent-volume-optimizer"]
-
+#ENTRYPOINT ["./persistent-volume-optimizer"]
+ENTRYPOINT ["echo", "Welcome to persistent-volume-optimizer"]

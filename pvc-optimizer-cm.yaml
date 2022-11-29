@@ -1,9 +1,9 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: pvc-optimizer-03
+  name: pvc-optimizer-02
   namespace: default
 data:
-  source-volume-path: pvc1
-  dest-volume-path: pvc2
+  source-volume-path: /mnt/vpcdisk
+  dest-volume-path: /mnt/cosdisk
   policy: "aDate>0days"   #days, months, years
