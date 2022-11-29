@@ -5,25 +5,18 @@ USER root
 RUN apt-get update
 RUN apt-get -y install cron
 
-# Set necessary environmet variables needed for our image
-#ENV GO111MODULE=on \
-#    CGO_ENABLED=0 \
-#    GOOS=linux \
-#    GOARCH=amd64
-
 RUN mkdir /app
 COPY persistent-volume-optimizer /app
 COPY /scripts/moveData.sh /app
+COPY /scripts/cron.sh /app
 WORKDIR /app
 
-RUN chmod +x /app/persistent-volume-optimizer /app/moveData.sh
+RUN chmod +x /app/persistent-volume-optimizer /app/moveData.sh /app/cron.sh
 #RUN go build --ldflags '-extldflags "-static"' -o persistent-volume-optimizer ./main.go
-ENTRYPOINT ["/app/persistent-volume-optimizer"]
+ENTRYPOINT ["/app/cron.sh"]
 
 # Add the cron job
-CMD ["/app/cron./sh"]
+#CMD ["/app/cron.sh &"]
 #CMD crontab -l | { cat; echo "*/1 * * * * bash /app/moveData.sh"; } | crontab -
 
-# Run the command on container startup
-#CMD cron
 
