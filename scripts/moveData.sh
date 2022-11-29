@@ -1,13 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 #read srcvolpath, destvolpath, policy from file
-#value=$(<pvc-optimizer-01.txt)
-#echo "$value"
-#cmDetails=echo $value | cut -d "\n"
-cmDetails=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f1)
-echo $cmDetails
-svolpath=$(echo $cmDetails | cut -d ' ' -f1)
-dvolpath=$(echo $cmDetails | cut -d ' ' -f2)
-policyADate=$(echo $cmDetails | cut -d ' ' -f3)
+sleep 20
+svolpath=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f1)
+dvolpath=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f2)
+policyADate=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f3)
 echo $svolpath
 echo $dvolpath
 echo $policyADate

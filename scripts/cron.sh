@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
-/app/persistent-volume-optimizer &
+#!/bin/bash
 cron
-sleep 10
+sleep 5
 crontab -l | { cat; echo "*/1 * * * * bash /app/moveData.sh"; } | crontab -
 crontab -l
+/app/persistent-volume-optimizer
