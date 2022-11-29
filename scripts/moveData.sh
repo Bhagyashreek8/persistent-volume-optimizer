@@ -16,10 +16,13 @@ find $svolpath -print0 | while IFS= read -r -d '' file;
 	    file1=$(echo $file | rev | cut -d "/" -f 1 | rev)
 	    echo "file1 $file1"
         #Get the Access Time of the file
-        aDate=$(stat $file | grep -i Access | tail -1 | awk -F " " '{print $dvolpath}')
+        aDate=$(stat $file | grep -i Access | tail -1 | awk -F " " '{print $2}')
+        echo "aDate: $aDate"
         #Get the date in above format
         currDate=$(date +%Y-%m-%d)
+        echo "currDate: $currDate"
         diff=$(( ($(date -d $aDate +%s) - $(date -d $currDate +%s)) / 86400))
+        echo "diff $diff"
         if [ "$diff" > "$policyADate" ]
         then
             echo "file to move: $file"
