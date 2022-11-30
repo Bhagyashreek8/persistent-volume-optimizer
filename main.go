@@ -129,8 +129,6 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 
 		policyArr := strings.Split(policy, ">")
 
-		log.Println("policyArr ", policyArr)
-
 		re:=regexp.MustCompile("\\d+|\\D+")
 		policyTmp := re.FindAllString(policyArr[1], -1)
 		policyDaysTmp, _ := strconv.Atoi(policyTmp[0])
@@ -148,11 +146,12 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		//create a file with name cmName and write values to it
 
 		cmDetail := srcVolPath + "\n" + destVolPath + "\n" + strconv.Itoa(policyDays)
-		log.Println("cmData: ", cmDetail)
+		//log.Println("cmData: ", cmDetail)
 
+		log.Println("creating a cm data file")
 		err := StoreOutputinFile("./"+cmName+".txt", cmDetail)
 		if err != nil {
-			log.Println("ERROR storing runbook link in file")
+			log.Println("ERROR storing configmap Detail in file")
 		}
 
 

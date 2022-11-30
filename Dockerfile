@@ -1,9 +1,9 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 USER root
 #Install Cron
 RUN apt-get update
-RUN apt-get -y install cron
+RUN apt-get -y install cron rsyslog
 
 RUN mkdir /app
 COPY persistent-volume-optimizer /app
@@ -18,5 +18,7 @@ ENTRYPOINT ["/app/cron.sh"]
 # Add the cron job
 #CMD ["/app/cron.sh &"]
 #CMD crontab -l | { cat; echo "*/1 * * * * bash /app/moveData.sh"; } | crontab -
+
+#(crontab -l -u root; echo "* * * * * touch /bhagya.txt") | crontab -
 
 
