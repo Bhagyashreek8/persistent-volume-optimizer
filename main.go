@@ -16,6 +16,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -24,8 +25,6 @@ import (
 )
 
 const (
-	//vpcProvisioner = "vpc.block.csi.ibm.io"
-	//s3fsProvisioner = "ibm.io/ibmc-s3fs"
 	cmNamePrefix = "pvc-optimizer"
 )
 
@@ -36,7 +35,7 @@ var master = flag.String(
 )
 
 
-// /Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-blk-cos-hackathon-cddqn4q20b8mu62tdjb0/kube-config-aaa00-bha-blk-cos-hackathon.yml
+// /Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-vpc-hack-ce424m720pqrva2brp50/kube-config-aaa00-bha-vpc-hack.yml
 var kubeconfig = flag.String(
 	"kubeconfig",
 	"",
@@ -82,15 +81,26 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 				fetchConfigMap(cmobj)
 			},
 			DeleteFunc: nil,
-			UpdateFunc: nil,
-		//	UpdateFunc: func(old, new interface{}) {
-		//		fmt.Printf("configmap updated \n")
-		//		cmobj, ok := new.(*v1.ConfigMap)
-		//		if !ok {
-		//			log.Println("Error in reading watcher update event data of config map")
-		//		}
-		//	fetchConfigMap(cmobj)
-		//},
+			//UpdateFunc: nil,
+			UpdateFunc: func(old, new interface{}) {
+				cmobj, _ := new.(*v1.ConfigMap)
+				oldobj, _ := old.(*v1.ConfigMap)
+				if cmobj.Name == "pvc-optimizer-01" {
+					log.Println("configmap new", cmobj.Data)
+					log.Println("configmap old", oldobj.Data)
+				}
+
+				if reflect.DeepEqual(old, new) == false {
+					log.Println("configmap Updated ")
+					cmobj, ok := new.(*v1.ConfigMap)
+					if !ok {
+						log.Println("Error in reading watcher update event data of config map")
+					}
+					fetchConfigMap(cmobj)
+				} else {
+					log.Println("not updated")
+				}
+		},
 		},
 	)
 
@@ -114,10 +124,6 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		destVolPath = cmData["dest-volume-path"]
 		//todo - remove trailing "/" from paths
 		policy := cmData["policy"]   //aDate>15days
-
-		//os.Setenv("SOURCEVOLPATH", srcVolPath)
-		//os.Setenv("DESTVOLPATH", destVolPath)
-		//os.Setenv("POLICY", policy)
 
 		if len(srcVolPath) == 0 || len(destVolPath) ==  0 || len(policy) == 0 {
 			log.Println("required params empty")
@@ -145,9 +151,7 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		log.Println("configmap policy days:", policyDays)
 
 		//create a file with name cmName and write values to it
-
 		cmDetail := srcVolPath + "\n" + destVolPath + "\n" + strconv.Itoa(policyDays)
-		//log.Println("cmData: ", cmDetail)
 
 		log.Println("creating a cm data file")
 		err := StoreOutputinFile("./"+cmName+".txt", cmDetail)
