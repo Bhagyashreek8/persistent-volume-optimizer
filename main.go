@@ -38,7 +38,7 @@ var master = flag.String(
 // /Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-vpc-hack-ce424m720pqrva2brp50/kube-config-aaa00-bha-vpc-hack.yml
 var kubeconfig = flag.String(
 	"kubeconfig",
-	"",
+	"/Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-vpc-hack-ce424m720pqrva2brp50/kube-config-aaa00-bha-vpc-hack.yml",
 	"Absolute path to the kubeconfig file. Either this or master needs to be set if the provisioner is being run out of cluster.",
 )
 
@@ -60,10 +60,18 @@ func main() {
 }
 
 func WatchConfigmap(k8sclient kubernetes.Interface) {
+	cmName := os.Getenv("CMNAME")
+	podNs := os.Getenv("POD_NAMESPACE")
+
+	//os.Setenv("POD_NAMESPACE", "default")
+
+	log.Println("cmName from pod env", cmName)
+	log.Println("podNs from pod env", podNs)
+
 	watchlist := cache.NewListWatchFromClient(
 		k8sclient.CoreV1().RESTClient(),
 		string(v1.ResourceConfigMaps),
-		v1.NamespaceAll,
+		podNs,
 		fields.Everything(),
 	)
 
@@ -73,14 +81,14 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 		60 * time.Second, //Duration is int64
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				fmt.Printf("configmap added \n")
+				log.Println("configmap added \n")
 				cmobj, ok := obj.(*v1.ConfigMap)
 				if !ok {
 					log.Println("Error in reading watcher add event data of config map")
 				}
 				fetchConfigMap(cmobj)
 			},
-			DeleteFunc: nil,
+			//DeleteFunc: nil,
 			//UpdateFunc: nil,
 			UpdateFunc: func(old, new interface{}) {
 				cmobj, _ := new.(*v1.ConfigMap)
@@ -90,7 +98,7 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 					log.Println("configmap old", oldobj.Data)
 				}
 
-				if reflect.DeepEqual(old, new) == false {
+				if !reflect.DeepEqual(old, new) {
 					log.Println("configmap Updated ")
 					cmobj, ok := new.(*v1.ConfigMap)
 					if !ok {
@@ -101,6 +109,14 @@ func WatchConfigmap(k8sclient kubernetes.Interface) {
 					log.Println("not updated")
 				}
 		},
+			DeleteFunc: func(obj interface{}) {
+				cmobj, ok := obj.(*v1.ConfigMap)
+				if !ok {
+					log.Println("Error in reading watcher add event data of config map")
+				}
+				log.Println("configmap deleted ", cmobj.Name)
+				stopCronjob(cmobj.Name)
+			},
 		},
 	)
 
@@ -158,15 +174,17 @@ func fetchConfigMap(cmobj *v1.ConfigMap) {
 		if err != nil {
 			log.Println("ERROR storing configmap Detail in file")
 		}
+	}
+}
 
+func stopCronjob(cmName string) {
+	//cmStatus := fmt.Sprintf("%v", cmobj.Status.Phase)
+	cmd := "sh /app/stopCron.sh > /app/stopcronlog.log 2>&1"
 
-		//cmd := "sh scripts/moveData.sh " + srcVolPath + " " + destVolPath + " " + strconv.Itoa(policyDays)
-		//
-		////call the script to move the files
-		//_, _, err := ExecuteCommand(cmd)
-		//if err != "" {
-		//	fmt.Println(err)
-		//}
+	//call the script to stop the files
+	_, _, err := ExecuteCommand(cmd)
+	if err != "" {
+		fmt.Println(err)
 	}
 }
 

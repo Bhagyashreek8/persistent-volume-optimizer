@@ -20,6 +20,11 @@ spec:
 
    - name: persistent-volume-optimizer
      image: bhagyak1/optimizer:26
+     env:
+       - name: CMNAME
+         value: "pvc-optimizer-01"
+       - name: POD_NAMESPACE
+           value: "default"
      volumeMounts:
        - mountPath: /mnt/vpcdisk
          name: vpcdisk
