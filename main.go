@@ -38,7 +38,7 @@ var master = flag.String(
 // /Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-vpc-hack-ce424m720pqrva2brp50/kube-config-aaa00-bha-vpc-hack.yml
 var kubeconfig = flag.String(
 	"kubeconfig",
-	"/Users/bhagyashree/.bluemix/plugins/container-service/clusters/bha-vpc-hack-ce424m720pqrva2brp50/kube-config-aaa00-bha-vpc-hack.yml",
+	"",
 	"Absolute path to the kubeconfig file. Either this or master needs to be set if the provisioner is being run out of cluster.",
 )
 
