@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: web-server
+  name: persistent-volume-optimizer
 spec:
   serviceAccountName: pod-enable
   containers:
-   - name: web-server-pod
+   - name: application-pod
      image: nginx:latest
      command:
         - "/bin/sh"
@@ -18,13 +18,13 @@ spec:
        - mountPath: /mnt/cosdisk
          name: cosdisk
 
-   - name: persistent-volume-optimizer
-     image: bhagyak1/optimizer:26
+   - name: persistent-volume-optimizer-pod
+     image: bhagyak1/optimizer:27
      env:
        - name: CMNAME
          value: "pvc-optimizer-01"
        - name: POD_NAMESPACE
-           value: "default"
+         value: "default"
      volumeMounts:
        - mountPath: /mnt/vpcdisk
          name: vpcdisk
