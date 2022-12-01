@@ -1,9 +1,9 @@
 #!/bin/bash
 #read srcvolpath, destvolpath, policy from file
 sleep 20
-svolpath=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f1)
-dvolpath=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f2)
-policyADate=$(cat pvc-optimizer-01.txt | cut -d$'\n' -f3)
+svolpath=$(cat /app/pvc-optimizer-01.txt | cut -d$'\n' -f1)
+dvolpath=$(cat /app/pvc-optimizer-01.txt | cut -d$'\n' -f2)
+policyADate=$(cat /app/pvc-optimizer-01.txt | cut -d$'\n' -f3)
 echo $svolpath
 echo $dvolpath
 echo $policyADate
