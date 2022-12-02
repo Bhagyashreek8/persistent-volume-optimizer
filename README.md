@@ -16,7 +16,7 @@ persistent-volume-optimizer will keep monitoring the files on the primary storag
 
 ## Architecture diagram
 
-Refer persistent-volume-optimizer.png in this repo.
+![](./persistent-volume-optimizer.png)
 
 
 ## How to use
